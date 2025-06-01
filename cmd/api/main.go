@@ -2,15 +2,21 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
-
 	"com.namycodes/internal/blog"
 	"com.namycodes/migrations"
 	"com.namycodes/pkg/config"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main(){
+	dotenverr := godotenv.Load()
+	if dotenverr != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	db:= config.ConnectDatabase()
 	migrations.RunMigrations(db)
 
