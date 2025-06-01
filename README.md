@@ -96,7 +96,8 @@ Base URL: `http://localhost:8080/api/v1/blogs`
 
 ```json
 {
-  "title": "Intro to Clean Architecture"
+  "title": "Intro to Clean Architecture",
+  "description": "Any Description here"
 }
 ```
 
