@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"com.namycodes/internal/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +17,7 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) CreateBlog(ctx *gin.Context) {
-	var blog Blog
+	var blog models.Blog
 
 	if err := ctx.ShouldBindJSON(&blog); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
@@ -26,6 +27,7 @@ func (h *Handler) CreateBlog(ctx *gin.Context) {
 	createdBlog, err := h.service.CreateBlog(&blog)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+		return
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{"blog": createdBlog})

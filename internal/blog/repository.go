@@ -1,12 +1,18 @@
 package blog
 
-import "gorm.io/gorm"
+import (
+	"database/sql"
+
+	"com.namycodes/internal/models"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 
 type Repository interface {
-	Create(blog *Blog) (*Blog, error)
-	GetAll() ([]*Blog, error)
-	GetById(id uint) (*Blog, error)
+	Create(blog *models.Blog) (*models.Blog, error)
+	GetAll() ([]*models.Blog, error)
+	GetById(id uint) (*models.Blog, error)
 	DeleteById(id uint) (uint, error)
 }
 
@@ -18,7 +24,14 @@ func NewRepository(db *gorm.DB) Repository{
 	return &repositoryImpl{db: db}
 }
 
-func (r *repositoryImpl) Create(blog *Blog) (*Blog, error){
+func (r *repositoryImpl) Create(blog *models.Blog) (*models.Blog, error){
+	var user models.User
+	
+	if err := r.db.Raw("SELECT * FROM users WHERE id = @userId", sql.Named("userId", blog.UserId)).Scan(&user).Error; err != nil {
+		return nil, err
+	}
+	blog.Id  = uuid.New()
+	blog.User = user
     if err:= r.db.Create(blog).Error; err != nil {
 		return nil, err
 	}
@@ -26,8 +39,8 @@ func (r *repositoryImpl) Create(blog *Blog) (*Blog, error){
 	return blog, nil
 }
 
-func (r *repositoryImpl) GetAll() ([]*Blog, error){
-	var blogs []*Blog
+func (r *repositoryImpl) GetAll() ([]*models.Blog, error){
+	var blogs []*models.Blog
 	if err:= r.db.Find(&blogs).Error; err != nil {
 		return nil, err
 	}
@@ -35,8 +48,8 @@ func (r *repositoryImpl) GetAll() ([]*Blog, error){
 	return blogs, nil
 }
 
-func (r *repositoryImpl) GetById(id uint) (*Blog, error){
-	var blog *Blog
+func (r *repositoryImpl) GetById(id uint) (*models.Blog, error){
+	var blog *models.Blog
 	if err := r.db.First(&blog, id).Error; err != nil {
 		return nil, err
 	}
@@ -44,7 +57,7 @@ func (r *repositoryImpl) GetById(id uint) (*Blog, error){
 }
 
 func (r *repositoryImpl) DeleteById(id uint) (uint, error){
-	var blog *Blog
+	var blog *models.Blog
 	if err := r.db.First(&blog, id).Error; err != nil {
 		return 0, nil
 	}

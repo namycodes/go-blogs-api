@@ -2,13 +2,14 @@ package migrations
 
 import (
 	"log"
-	"com.namycodes/internal/blog"
+	"com.namycodes/internal/models"
 	"gorm.io/gorm"
 )
 
 func RunMigrations(db *gorm.DB){
    err := db.AutoMigrate(
-	blog.Blog{},
+	models.Blog{},
+	models.User{},
    )
 
    if err != nil {
