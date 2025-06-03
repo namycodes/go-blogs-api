@@ -39,6 +39,7 @@ func main(){
 		blogs.POST("/", blogHandler.CreateBlog)
 		blogs.GET("/:id", blogHandler.GetBlogById)
 		blogs.DELETE("/:id", blogHandler.DeleteBlogById)
+		blogs.PATCH("/:id", blogHandler.UpdateBlog)
 	}
 
 	authentication := router.Group("/api/v1/auth")

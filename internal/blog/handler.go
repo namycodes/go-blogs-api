@@ -2,11 +2,11 @@ package blog
 
 import (
 	"net/http"
-	"strconv"
 
 	dto "com.namycodes/internal/dto/responsedto"
 	"com.namycodes/internal/models"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type Handler struct {
@@ -32,10 +32,10 @@ func (h *Handler) CreateBlog(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{"blog": dto.BlogResponseDto{
-		Id: createdBlog.Id,
-		Title: createdBlog.Title,
+		Id:          createdBlog.Id,
+		Title:       createdBlog.Title,
 		Description: createdBlog.Description,
-		UserId: createdBlog.UserId,
+		UserId:      createdBlog.UserId,
 	}})
 }
 
@@ -48,13 +48,13 @@ func (h *Handler) GetAllBlogs(ctx *gin.Context) {
 
 	var blogsResponse []dto.BlogResponseDto
 
-	for _, b := range blogs{
-       blogsResponse = append(blogsResponse, dto.BlogResponseDto{
-		Id: b.Id,
-		Title: b.Title,
-		Description: b.Description,
-		UserId: b.UserId,
-	   })
+	for _, b := range blogs {
+		blogsResponse = append(blogsResponse, dto.BlogResponseDto{
+			Id:          b.Id,
+			Title:       b.Title,
+			Description: b.Description,
+			UserId:      b.UserId,
+		})
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"blogs": blogsResponse})
@@ -62,15 +62,7 @@ func (h *Handler) GetAllBlogs(ctx *gin.Context) {
 
 func (h *Handler) GetBlogById(ctx *gin.Context) {
 
-	idParam := ctx.Param("id")
-
-	idUint64, err := strconv.ParseUint(idParam, 10, 32)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
-		return
-	}
-
-	id := uint(idUint64)
+	id := ctx.Param("id")
 
 	blog, err := h.service.FindBlogById(id)
 	if err != nil {
@@ -78,26 +70,57 @@ func (h *Handler) GetBlogById(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"blog": blog})
+	ctx.JSON(http.StatusOK, gin.H{"blog": dto.BlogResponseDto{
+		Id:          blog.Id,
+		Title:       blog.Title,
+		Description: blog.Description,
+		UserId:      blog.UserId,
+	}})
 }
 
+func (h *Handler) DeleteBlogById(ctx *gin.Context) {
+	id := ctx.Param("id")
 
-func (h *Handler) DeleteBlogById(ctx *gin.Context){
-	idParam := ctx.Param("id")
-
-	idUint64, err := strconv.ParseUint(idParam, 10, 32)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
-		return
-	}
-
-	id := uint(idUint64)
-    id, err = h.service.DeleteBlogById(id)
+	val, err := h.service.DeleteBlogById(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"id": id})
+	if val == 0 {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Could not delete blog"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Deleted blog Successfully"})
+}
+
+func (h *Handler) UpdateBlog(ctx *gin.Context) {
+	var updatedBlogBody models.Blog
+
+	if err := ctx.ShouldBindJSON(&updatedBlogBody); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	id := ctx.Param("id")
+
+	isBlogUpdated, err := h.service.UpdateBlogById(id, &models.Blog{
+		Title:       updatedBlogBody.Title,
+		Description: updatedBlogBody.Description,
+	})
+
+	if err != nil || !isBlogUpdated {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	blogId, err := uuid.Parse(id)
+
+	ctx.JSON(http.StatusOK, gin.H{"blog": dto.BlogResponseDto{
+		Id: blogId,
+		Title:       updatedBlogBody.Title,
+		Description: updatedBlogBody.Description,
+	}})
 }

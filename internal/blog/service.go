@@ -1,12 +1,15 @@
 package blog
 
-import "com.namycodes/internal/models"
+import (
+	"com.namycodes/internal/models"
+)
 
 type Service interface {
 	CreateBlog(blog *models.Blog) (*models.Blog, error)
 	FindAllBlogs() ([]*models.Blog, error)
-	FindBlogById(id uint) (*models.Blog, error)
-	DeleteBlogById(id uint) (uint, error)
+	FindBlogById(id string) (*models.Blog, error)
+	DeleteBlogById(id string) (uint, error)
+	UpdateBlogById(id string, updatedBlod *models.Blog) (bool, error)
 }
 
 type serviceImpl struct {
@@ -25,10 +28,14 @@ func (s *serviceImpl) FindAllBlogs() ([]*models.Blog, error){
 	return s.repo.GetAll()
 }
 
-func (s *serviceImpl) FindBlogById(id uint) (*models.Blog, error){
+func (s *serviceImpl) FindBlogById(id string) (*models.Blog, error){
 	return s.repo.GetById(id)
 }
 
-func (s *serviceImpl) DeleteBlogById(id uint) (uint, error){
+func (s *serviceImpl) DeleteBlogById(id string) (uint, error){
 	return s.repo.DeleteById(id)
+}
+
+func (s *serviceImpl) UpdateBlogById(id string,updatedBlog *models.Blog) (bool, error){
+	return s.repo.Update(id, updatedBlog)
 }
