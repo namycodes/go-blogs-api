@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	dto "com.namycodes/internal/dto/responsedto"
 	"com.namycodes/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -30,7 +31,12 @@ func (h *Handler) CreateBlog(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{"blog": createdBlog})
+	ctx.JSON(http.StatusCreated, gin.H{"blog": dto.BlogResponseDto{
+		Id: createdBlog.Id,
+		Title: createdBlog.Title,
+		Description: createdBlog.Description,
+		UserId: createdBlog.UserId,
+	}})
 }
 
 func (h *Handler) GetAllBlogs(ctx *gin.Context) {
@@ -40,7 +46,18 @@ func (h *Handler) GetAllBlogs(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"blogs": blogs})
+	var blogsResponse []dto.BlogResponseDto
+
+	for _, b := range blogs{
+       blogsResponse = append(blogsResponse, dto.BlogResponseDto{
+		Id: b.Id,
+		Title: b.Title,
+		Description: b.Description,
+		UserId: b.UserId,
+	   })
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"blogs": blogsResponse})
 }
 
 func (h *Handler) GetBlogById(ctx *gin.Context) {
