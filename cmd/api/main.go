@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"com.namycodes/internal/authentication"
 	"com.namycodes/internal/blog"
+	"com.namycodes/internal/middleware"
 	"com.namycodes/migrations"
 	"com.namycodes/pkg/config"
 	"github.com/gin-gonic/gin"
@@ -25,13 +28,23 @@ func main(){
 	blogRepository := blog.NewRepository(db)
 	blogService := blog.NewService(blogRepository)
 	blogHandler := blog.NewHandler(blogService)
+    authRepository := authentication.NewRepository(db)
+	authService := authentication.NewService(authRepository)
+	authHandler := authentication.NewHandler(authService)
 
 	blogs := router.Group("/api/v1/blogs")
+	 blogs.Use(middleware.JwtAuth())
 	{
 		blogs.GET("/", blogHandler.GetAllBlogs)
 		blogs.POST("/", blogHandler.CreateBlog)
 		blogs.GET("/:id", blogHandler.GetBlogById)
 		blogs.DELETE("/:id", blogHandler.DeleteBlogById)
+	}
+
+	authentication := router.Group("/api/v1/auth")
+	{
+		authentication.POST("/register", authHandler.RegisterUser)
+		authentication.POST("/login", authHandler.Login)
 	}
 
 	
