@@ -3,6 +3,7 @@ package blog
 import (
 	"net/http"
 
+	"com.namycodes/helpers"
 	dto "com.namycodes/internal/dto/responsedto"
 	"com.namycodes/internal/models"
 	"github.com/gin-gonic/gin"
@@ -31,12 +32,13 @@ func (h *Handler) CreateBlog(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{"blog": dto.BlogResponseDto{
+	helpers.Response(ctx, "Creeated Blog Successfully", http.StatusCreated, "blog", dto.BlogResponseDto{
 		Id:          createdBlog.Id,
 		Title:       createdBlog.Title,
 		Description: createdBlog.Description,
 		UserId:      createdBlog.UserId,
-	}})
+	})
+
 }
 
 func (h *Handler) GetAllBlogs(ctx *gin.Context) {
@@ -57,7 +59,7 @@ func (h *Handler) GetAllBlogs(ctx *gin.Context) {
 		})
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"blogs": blogsResponse})
+	helpers.Response(ctx, "All Blogs", http.StatusOK, "blogs", blogsResponse)
 }
 
 func (h *Handler) GetBlogById(ctx *gin.Context) {
@@ -70,12 +72,13 @@ func (h *Handler) GetBlogById(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"blog": dto.BlogResponseDto{
+	helpers.Response(ctx, "Fetched Blog Successfully", http.StatusOK, "blog", dto.BlogResponseDto{
 		Id:          blog.Id,
 		Title:       blog.Title,
 		Description: blog.Description,
 		UserId:      blog.UserId,
-	}})
+	})
+
 }
 
 func (h *Handler) DeleteBlogById(ctx *gin.Context) {
@@ -93,7 +96,8 @@ func (h *Handler) DeleteBlogById(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Deleted blog Successfully"})
+	helpers.Response(ctx, "Deleted blog Successfully", http.StatusOK, "blog", nil)
+
 }
 
 func (h *Handler) UpdateBlog(ctx *gin.Context) {
@@ -118,9 +122,10 @@ func (h *Handler) UpdateBlog(ctx *gin.Context) {
 
 	blogId, err := uuid.Parse(id)
 
-	ctx.JSON(http.StatusOK, gin.H{"blog": dto.BlogResponseDto{
-		Id: blogId,
+	helpers.Response(ctx, "Updated Blog Successfully", http.StatusOK, "blog", dto.BlogResponseDto{
+		Id:          blogId,
 		Title:       updatedBlogBody.Title,
 		Description: updatedBlogBody.Description,
-	}})
+	})
+
 }

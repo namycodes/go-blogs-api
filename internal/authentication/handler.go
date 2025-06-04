@@ -32,12 +32,13 @@ func (h *Handler) RegisterUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{"user": &dto_two.RegisteredUserResponseDto{
+	helpers.Response(ctx, "Created Account Successfully", http.StatusCreated, "user", &dto_two.RegisteredUserResponseDto{
 		FirstName: createdUser.FirstName,
 		LastName:  createdUser.LastName,
 		Email:     createdUser.Email,
 		Gender:    createdUser.Gender,
-	}})
+	})
+
 }
 
 func (h *Handler) Login(ctx *gin.Context) {
@@ -68,6 +69,6 @@ func (h *Handler) Login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"token": token})
+	helpers.Response(ctx, "Authentication Successfull", http.StatusOK, "token", token)
 
 }

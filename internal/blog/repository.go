@@ -2,6 +2,7 @@ package blog
 
 import (
 	"database/sql"
+	"errors"
 
 	"com.namycodes/internal/models"
 	"github.com/google/uuid"
@@ -59,7 +60,7 @@ func (r *repositoryImpl) GetById(id string) (*models.Blog, error) {
 func (r *repositoryImpl) DeleteById(id string) (uint, error) {
 	var blog *models.Blog
 	if err := r.db.First(&blog, "id =?", id).Error; err != nil {
-		return 0, nil
+		return 0, errors.New("Blog with id does not exist")
 	}
 
 	if err := r.db.Delete(&blog, "id =?", id).Error; err != nil {
