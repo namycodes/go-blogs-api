@@ -26,6 +26,8 @@ blogs-api/
 ├── service/          # Business logic layer
 ├── handler/          # HTTP handlers (Gin controllers)
 ├── main.go           # App entry point
+|__ internal/         # internal Workings of the app
+|__ pkg/              # Database configs
 └── go.mod            # Go module definition
 ```
 
@@ -89,6 +91,14 @@ Base URL: `http://localhost:8080/api/v1/blogs`
 | `POST` | `/`      | Create a new blog |
 | `GET`  | `/:id`   | Get blog by ID    |
 | `DELETE`  | `/:id`   | Delete blog by ID    |
+| `PATCH`  | `/:id`   | Edit blog by ID    |
+
+Base URL: `http://localhost:8080/api/v1/auth`
+
+| Method | Endpoint | Description       |
+| ------ | -------- | ----------------- |
+| `POST`  | `/login`      | User Login     |
+| `POST` | `/register`      | Register New User |
 
 ---
 
